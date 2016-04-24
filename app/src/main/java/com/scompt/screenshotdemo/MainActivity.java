@@ -11,6 +11,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
 
+import com.robinhood.spark.SparkAdapter;
+import com.robinhood.spark.SparkView;
 import com.scompt.screenshotdemo.forecastio.ForecastIoWeatherService;
 import com.scompt.screenshotdemo.ipapi.IpApiGeolocationService;
 import com.scompt.screenshotdemo.models.Location;
@@ -32,7 +34,7 @@ import timber.log.Timber;
 
 public class MainActivity extends AppCompatActivity {
 
-    public static final PagerAdapter EMPTY_ADAPTER = new PagerAdapter() {
+    public static final PagerAdapter EMPTY_PAGER_ADAPTER = new PagerAdapter() {
         @Override
         public int getCount() {
             return 0;
@@ -47,6 +49,24 @@ public class MainActivity extends AppCompatActivity {
 
     private WeatherService weatherService;
 
+    public static final SparkAdapter EMPTY_SPARK_ADAPTER = new SparkAdapter() {
+
+        @Override
+        public int getCount() {
+            return 0;
+        }
+
+        @Override
+        public Object getItem(int index) {
+            return null;
+        }
+
+        @Override
+        public float getY(int index) {
+            return 0;
+        }
+    };
+
     @BindView(R.id.coordinator_layout)
     CoordinatorLayout coordinatorLayout;
 
@@ -56,13 +76,21 @@ public class MainActivity extends AppCompatActivity {
     @BindView(R.id.view_pager)
     ViewPager viewPager;
 
+    @BindView(R.id.spark1)
+    SparkView sparkView1;
+
+    @BindView(R.id.spark2)
+    SparkView sparkView2;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        viewPager.setAdapter(EMPTY_ADAPTER);
+        viewPager.setAdapter(EMPTY_PAGER_ADAPTER);
+        sparkView1.setAdapter(EMPTY_SPARK_ADAPTER);
+        sparkView2.setAdapter(EMPTY_SPARK_ADAPTER);
 
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
         logging.setLevel(HttpLoggingInterceptor.Level.BODY);
@@ -102,12 +130,16 @@ public class MainActivity extends AppCompatActivity {
                 List<WeatherDatum> weatherDays = locationWeather.dailyWeather();
                 viewPager.setAdapter(new WeatherPagerAdapter(LayoutInflater.from(MainActivity.this),
                                                              weatherDays));
+                sparkView1.setAdapter(new WeatherSparkAdapter(weatherDays, WeatherSparkAdapter.Mode.MIN));
+                sparkView2.setAdapter(new WeatherSparkAdapter(weatherDays, WeatherSparkAdapter.Mode.MAX));
             }
         }, new Action1<Throwable>() {
             @Override
             public void call(Throwable t) {
                 headerTextView.setText(R.string.weather_in_unknown);
-                viewPager.setAdapter(EMPTY_ADAPTER);
+                viewPager.setAdapter(EMPTY_PAGER_ADAPTER);
+                sparkView1.setAdapter(EMPTY_SPARK_ADAPTER);
+                sparkView2.setAdapter(EMPTY_SPARK_ADAPTER);
 
                 Timber.e(t, "geolocating");
                 Snackbar.make(coordinatorLayout, "error: " + t.getMessage(), Snackbar.LENGTH_INDEFINITE)
