@@ -9,6 +9,9 @@ import com.scompt.screenshotdemo.WeatherService;
 import com.scompt.screenshotdemo.models.WeatherIconAdapter;
 import com.squareup.moshi.Moshi;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
@@ -22,7 +25,8 @@ import rx.schedulers.Schedulers;
 public class ForecastIoWeatherService implements WeatherService {
     private final ForecastIoService forecastIoService;
 
-    public ForecastIoWeatherService(OkHttpClient client) {
+    @Inject
+    public ForecastIoWeatherService(OkHttpClient client, @Named("IpApiKey") String apiKey) {
         final Moshi moshi = new Moshi.Builder()
                 .add(ForecastIoResponse.typeAdapterFactory())
                 .add(WeatherDatum.typeAdapterFactory())
@@ -31,8 +35,9 @@ public class ForecastIoWeatherService implements WeatherService {
                 .add(new InstantAdapter())
                 .build();
 
+        String baseUrl = String.format("https://api.forecast.io/forecast/%s/", apiKey);
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://api.forecast.io/forecast/96ca26ee5397181411f9ba4311a5a799/")
+                .baseUrl(baseUrl)
                 .client(client)
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.createWithScheduler(Schedulers.io()))
                 .addConverterFactory(MoshiConverterFactory.create(moshi))

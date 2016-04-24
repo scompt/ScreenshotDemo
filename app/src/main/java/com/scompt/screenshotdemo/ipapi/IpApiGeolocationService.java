@@ -4,6 +4,8 @@ import com.scompt.screenshotdemo.GeolocationService;
 import com.scompt.screenshotdemo.models.Location;
 import com.squareup.moshi.Moshi;
 
+import javax.inject.Inject;
+
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
@@ -17,6 +19,7 @@ public class IpApiGeolocationService implements GeolocationService {
 
     private final IpApiService ipApiService;
 
+    @Inject
     public IpApiGeolocationService(OkHttpClient client) {
         final Moshi moshi = new Moshi.Builder()
                 .add(IpApiLocation.typeAdapterFactory())

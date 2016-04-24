@@ -52,4 +52,8 @@ dependencies {
 
     compile 'com.github.scompt:spark:01156c'
     compile 'com.jakewharton.threetenabp:threetenabp:1.0.3'
+
+    compile  'com.google.dagger:dagger:2.2'
+    apt      'com.google.dagger:dagger-compiler:2.2'
+    provided 'com.google.dagger:dagger-compiler:2.2'
 }

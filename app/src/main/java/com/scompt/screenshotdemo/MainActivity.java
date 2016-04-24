@@ -14,8 +14,6 @@ import android.widget.TextView;
 
 import com.robinhood.spark.SparkAdapter;
 import com.robinhood.spark.SparkView;
-import com.scompt.screenshotdemo.forecastio.ForecastIoWeatherService;
-import com.scompt.screenshotdemo.ipapi.IpApiGeolocationService;
 import com.scompt.screenshotdemo.models.Location;
 import com.scompt.screenshotdemo.models.LocationWeather;
 import com.scompt.screenshotdemo.models.WeatherDatum;
@@ -23,10 +21,10 @@ import com.scompt.screenshotdemo.models.WeatherDatum;
 import java.util.Collections;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import okhttp3.OkHttpClient;
-import okhttp3.logging.HttpLoggingInterceptor;
 import rx.Single;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
@@ -46,9 +44,6 @@ public class MainActivity extends AppCompatActivity {
             return false;
         }
     };
-    private GeolocationService geolocationService;
-
-    private WeatherService weatherService;
 
     public static final SparkAdapter EMPTY_SPARK_ADAPTER = new SparkAdapter() {
 
@@ -86,24 +81,23 @@ public class MainActivity extends AppCompatActivity {
     @BindView(R.id.spark2)
     SparkView sparkView2;
 
+    @Inject
+    WeatherService weatherService;
+
+    @Inject
+    GeolocationService geolocationService;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ScreenshotDemoApplication.get(this).component().inject(this);
+
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
         viewPager.setAdapter(EMPTY_PAGER_ADAPTER);
         sparkView1.setAdapter(EMPTY_SPARK_ADAPTER);
         sparkView2.setAdapter(EMPTY_SPARK_ADAPTER);
-
-        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
-        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
-        OkHttpClient client = new OkHttpClient.Builder()
-                .addInterceptor(logging)
-                .build();
-
-        geolocationService = new IpApiGeolocationService(client);
-        weatherService = new ForecastIoWeatherService(client);
 
         makeCall();
     }
