@@ -6,6 +6,8 @@ import android.content.Context;
 import com.scompt.screenshotdemo.dagger.ApplicationModule;
 import com.scompt.screenshotdemo.dagger.DaggerScreenshotDemoComponent;
 import com.scompt.screenshotdemo.dagger.ScreenshotDemoComponent;
+import com.scompt.screenshotdemo.mock.MockGeolocationModule;
+import com.scompt.screenshotdemo.models.Location;
 
 import com.jakewharton.threetenabp.AndroidThreeTen;
 
@@ -20,8 +22,11 @@ public class ScreenshotDemoApplication extends Application {
         AndroidThreeTen.init(this);
         Timber.plant(new Timber.DebugTree());
 
+        Location location = Location.create("New York", 407127, -740059);
+
         component = DaggerScreenshotDemoComponent.builder()
                                                  .applicationModule(new ApplicationModule(this))
+                                                 .mockGeolocationModule(new MockGeolocationModule(location))
                                                  .build();
     }
 
