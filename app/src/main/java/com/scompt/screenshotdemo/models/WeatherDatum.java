@@ -21,6 +21,11 @@ public abstract class WeatherDatum {
 
     public abstract Instant time();
 
+    public static WeatherDatum create(String summary, WeatherIcon icon, float temperatureMin,
+                                      float temperatureMax, Instant time) {
+        return new AutoValue_WeatherDatum(summary, icon, temperatureMin, temperatureMax, time);
+    }
+
     public static JsonAdapter.Factory typeAdapterFactory() {
         return new AutoValue_WeatherDatum.AutoValue_WeatherDatumJsonAdapterFactory();
     }
