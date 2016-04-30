@@ -9,6 +9,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.robinhood.spark.SparkAdapter;
@@ -70,6 +71,9 @@ public class MainActivity extends AppCompatActivity {
     @BindView(R.id.coordinator_layout)
     CoordinatorLayout coordinatorLayout;
 
+    @BindView(R.id.progress)
+    ProgressBar progressBar;
+
     @BindView(R.id.header)
     TextView headerTextView;
 
@@ -105,6 +109,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void makeCall() {
+        progressBar.setVisibility(View.VISIBLE);
+        headerTextView.setVisibility(View.INVISIBLE);
+
         geolocationService.geolocate()
                           .flatMap(new Func1<Location, Single<LocationWeather>>() {
             @Override
@@ -132,6 +139,8 @@ public class MainActivity extends AppCompatActivity {
                                                              weatherDays));
                 sparkView1.setAdapter(new WeatherSparkAdapter(weatherDays, WeatherSparkAdapter.Mode.MIN));
                 sparkView2.setAdapter(new WeatherSparkAdapter(weatherDays, WeatherSparkAdapter.Mode.MAX));
+                progressBar.setVisibility(View.INVISIBLE);
+                headerTextView.setVisibility(View.VISIBLE);
             }
         }, new Action1<Throwable>() {
             @Override
@@ -140,6 +149,8 @@ public class MainActivity extends AppCompatActivity {
                 viewPager.setAdapter(EMPTY_PAGER_ADAPTER);
                 sparkView1.setAdapter(EMPTY_SPARK_ADAPTER);
                 sparkView2.setAdapter(EMPTY_SPARK_ADAPTER);
+                progressBar.setVisibility(View.INVISIBLE);
+                headerTextView.setVisibility(View.VISIBLE);
 
                 Timber.e(t, "geolocating");
                 Snackbar.make(coordinatorLayout, "error: " + t.getMessage(), Snackbar.LENGTH_INDEFINITE)
