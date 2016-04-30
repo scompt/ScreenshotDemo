@@ -20,6 +20,7 @@ android {
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
+        testInstrumentationRunner "com.scompt.screenshotdemo.test.MockTestRunner"
     }
     buildTypes {
         release {
@@ -56,4 +57,15 @@ dependencies {
     compile  'com.google.dagger:dagger:2.2'
     apt      'com.google.dagger:dagger-compiler:2.2'
     provided 'com.google.dagger:dagger-compiler:2.2'
+
+    androidTestCompile  'com.google.dagger:dagger:2.2'
+    androidTestApt      'com.google.dagger:dagger-compiler:2.2'
+    androidTestProvided 'com.google.dagger:dagger-compiler:2.2'
+
+    androidTestCompile 'com.android.support.test:runner:0.5'
+    androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2'
+    androidTestCompile 'com.android.support:support-annotations:23.3.0'
+
+    androidTestCompile "org.mockito:mockito-core:2.0.8-beta"
+    androidTestCompile 'com.google.dexmaker:dexmaker-mockito:1.2'
 }
