@@ -43,20 +43,28 @@
             android:layout_height="100dp"
             android:layout_alignParentBottom="true"
             android:background="@android:color/darker_gray"
-            android:paddingTop="@dimen/activity_vertical_margin"
-            android:paddingBottom="@dimen/activity_vertical_margin"
             >
             <com.robinhood.spark.SparkView
                 android:id="@+id/spark1"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:layout_marginBottom="@dimen/activity_vertical_margin"
                 app:spark_lineColor="@android:color/holo_blue_light"
                 />
             <com.robinhood.spark.SparkView
                 android:id="@+id/spark2"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:layout_marginBottom="@dimen/activity_vertical_margin"
                 app:spark_lineColor="@android:color/holo_red_light"
+                />
+            <View android:id="@+id/highlight"
+                  android:visibility="gone"
+                  android:layout_height="match_parent"
+                  android:layout_width="0dp"
+                  android:background="@color/highlight"
                 />
         </FrameLayout>
 

@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -84,6 +85,9 @@ public class MainActivity extends RxAppCompatActivity {
     @BindView(R.id.spark2)
     SparkView sparkView2;
 
+    @BindView(R.id.highlight)
+    View sparkHighlight;
+
     @Inject
     WeatherService weatherService;
 
@@ -94,6 +98,8 @@ public class MainActivity extends RxAppCompatActivity {
     // pick up the current enabled status and track it.
     private final BehaviorSubject<Boolean> refreshMenuItemEnabledSubject = BehaviorSubject.create(false);
 
+    private int highlightWidth;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -102,6 +108,27 @@ public class MainActivity extends RxAppCompatActivity {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
+        viewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                float positionMultiplier = position + positionOffset;
+                sparkHighlight.setTranslationX(positionMultiplier * highlightWidth);
+            }
+        });
+        viewPager.getViewTreeObserver().addOnGlobalLayoutListener(
+                new ViewTreeObserver.OnGlobalLayoutListener() {
+                    @Override
+                    public void onGlobalLayout() {
+                        int dayCount = sparkView1.getAdapter().getCount();
+                        if (dayCount == 0) {
+                            highlightWidth = 0;
+                        } else {
+                            highlightWidth = sparkView1.getWidth() / dayCount;
+                        }
+                        sparkHighlight.getLayoutParams().width = highlightWidth;
+                        sparkHighlight.requestLayout();
+                    }
+                });
         makeCall();
     }
 
@@ -136,6 +163,7 @@ public class MainActivity extends RxAppCompatActivity {
         viewPager.setAdapter(EMPTY_PAGER_ADAPTER);
         sparkView1.setAdapter(EMPTY_SPARK_ADAPTER);
         sparkView2.setAdapter(EMPTY_SPARK_ADAPTER);
+        sparkHighlight.setVisibility(View.GONE);
 
         progressBar.setVisibility(View.VISIBLE);
         headerTextView.setVisibility(View.INVISIBLE);
@@ -169,8 +197,8 @@ public class MainActivity extends RxAppCompatActivity {
                 sparkView2.setAdapter(new WeatherSparkAdapter(weatherDays, WeatherSparkAdapter.Mode.MAX));
                 progressBar.setVisibility(View.INVISIBLE);
                 headerTextView.setVisibility(View.VISIBLE);
+                sparkHighlight.setVisibility(View.VISIBLE);
                 refreshMenuItemEnabledSubject.onNext(true);
-
             }
         }, new Action1<Throwable>() {
             @Override
@@ -180,6 +208,7 @@ public class MainActivity extends RxAppCompatActivity {
                 viewPager.setAdapter(EMPTY_PAGER_ADAPTER);
                 sparkView1.setAdapter(EMPTY_SPARK_ADAPTER);
                 sparkView2.setAdapter(EMPTY_SPARK_ADAPTER);
+                sparkHighlight.setVisibility(View.GONE);
                 progressBar.setVisibility(View.INVISIBLE);
                 headerTextView.setVisibility(View.VISIBLE);
 
