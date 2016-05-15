@@ -30,6 +30,7 @@ import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.not;
 import static org.mockito.Mockito.doReturn;
 
@@ -62,7 +63,8 @@ public class TestMainActivity {
         onView(withId(R.id.progress)).check(matches(not(isDisplayed())));
         onView(withId(R.id.header)).check(matches(allOf(isDisplayed(), withText(R.string.weather_in_unknown))));
 
-        onView(allOf(withId(android.support.design.R.id.snackbar_text), withText("error: message")))
+        onView(allOf(withId(android.support.design.R.id.snackbar_text),
+                     withText(endsWith(": message"))))
                 .check(matches(isDisplayed()));
         Screengrab.screenshot("error");
     }

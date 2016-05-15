@@ -3,4 +3,6 @@
     <string name="app_name">ScreenshotDemo</string>
     <string name="weather_in">Das Wetter in\n%s</string>
     <string name="weather_in_unknown">Das Wetter in\nUnbekannt</string>
+    <string name="retry">wiederholen</string>
+    <string name="error">Fehler: %s</string>
 </resources>

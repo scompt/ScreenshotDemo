@@ -2,4 +2,6 @@
     <string name="app_name" translatable="false">ScreenshotDemo</string>
     <string name="weather_in_unknown">The weather in\nUnknown</string>
     <string name="weather_in">The weather in\n%s</string>
+    <string name="retry">retry</string>
+    <string name="error">Error: %s</string>
 </resources>

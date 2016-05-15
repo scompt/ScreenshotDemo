@@ -147,9 +147,10 @@ public class MainActivity extends AppCompatActivity {
                 headerTextView.setVisibility(View.VISIBLE);
 
                 Timber.e(t, "geolocating");
-                Snackbar.make(coordinatorLayout, "error: " + t.getMessage(), Snackbar.LENGTH_INDEFINITE)
+                String errorMessage = getString(R.string.error, t.getLocalizedMessage());
+                Snackbar.make(coordinatorLayout, errorMessage, Snackbar.LENGTH_INDEFINITE)
                         .setActionTextColor(Color.RED)
-                        .setAction("retry", new View.OnClickListener() {
+                        .setAction(R.string.retry, new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 makeCall();
