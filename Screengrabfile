@@ -1,0 +1,17 @@
+# remove the leading '#' to uncomment lines
+
+app_package_name 'com.scompt.screenshotdemo'
+use_tests_in_packages ['com.scompt.screenshotdemo']
+
+app_apk_path 'app/build/outputs/apk/app-debug.apk'
+tests_apk_path 'app/build/outputs/apk/app-debug-androidTest-unaligned.apk'
+
+locales ['en-US', 'fr-FR', 'it-IT', 'de-DE']
+ending_locale 'en-US'
+
+# clear all previously generated screenshots in your local output directory before creating new ones
+clear_previous_screenshots true
+
+test_instrumentation_runner 'com.scompt.screenshotdemo.test.MockTestRunner'
+# For more information about all available options run
+#   screengrab --help

@@ -11,6 +11,7 @@ import com.scompt.screenshotdemo.test.MockComponent;
 import com.scompt.screenshotdemo.test.MockDemoApplication;
 
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,6 +20,8 @@ import javax.inject.Inject;
 
 import rx.Observable;
 import rx.Single;
+import tools.fastlane.screengrab.Screengrab;
+import tools.fastlane.screengrab.locale.LocaleTestRule;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
@@ -35,6 +38,9 @@ import static org.mockito.Mockito.doReturn;
 public class TestMainActivity {
     @Rule
     public ActivityTestRule<MainActivity> mActivityRule = new ActivityTestRule<>(MainActivity.class, false, false);
+
+    @ClassRule
+    public static final LocaleTestRule localeTestRule = new LocaleTestRule();
 
     @Inject
     GeolocationService geolocationService;
@@ -58,6 +64,7 @@ public class TestMainActivity {
 
         onView(allOf(withId(android.support.design.R.id.snackbar_text), withText("error: message")))
                 .check(matches(isDisplayed()));
+        Screengrab.screenshot("error");
     }
 
     @Test
@@ -69,11 +76,13 @@ public class TestMainActivity {
 
         onView(withId(R.id.progress)).check(matches(not(isDisplayed())));
         onView(withId(R.id.header)).check(matches(isDisplayed()));
+        Screengrab.screenshot("error");
 
         onView(withId(android.support.design.R.id.snackbar_action)).perform(click());
 
         onView(withId(R.id.progress)).check(matches(isDisplayed()));
         onView(withId(R.id.header)).check(matches(not(isDisplayed())));
+        Screengrab.screenshot("progress");
     }
 
     @Test
@@ -86,6 +95,7 @@ public class TestMainActivity {
         mActivityRule.launchActivity(null);
         onView(withId(R.id.progress)).check(matches(not(isDisplayed())));
         onView(withId(R.id.header)).check(matches(allOf(isDisplayed(), withText("The weather in\nNew York"))));
+        Screengrab.screenshot("location");
         // TODO: test that weather isn't shown
     }
 

@@ -68,4 +68,6 @@ dependencies {
 
     androidTestCompile "org.mockito:mockito-core:2.0.8-beta"
     androidTestCompile 'com.google.dexmaker:dexmaker-mockito:1.2'
+
+    androidTestCompile 'tools.fastlane:screengrab:0.3.2'
 }
