@@ -25,6 +25,7 @@ import tools.fastlane.screengrab.locale.LocaleTestRule;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
+import static android.support.test.espresso.action.ViewActions.swipeRight;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
@@ -51,14 +52,18 @@ public class TestMainActivity {
 
     @Test
     public void testProgressIsShownWhileLoading() throws Exception {
-        doReturn(Observable.<Location>never().toSingle()).when(geolocationService).geolocate();
+        doReturn(Observable.<Location>never().toSingle())
+                .when(geolocationService)
+                .geolocate();
         mActivityRule.launchActivity(null);
         onView(withId(R.id.progress)).check(matches(isDisplayed()));
     }
 
     @Test
     public void testAnErrorOccurred() throws Exception {
-        doReturn(Single.error(new RuntimeException("message"))).when(geolocationService).geolocate();
+        doReturn(Single.error(new RuntimeException("message")))
+                .when(geolocationService)
+                .geolocate();
         mActivityRule.launchActivity(null);
         onView(withId(R.id.progress)).check(matches(not(isDisplayed())));
         onView(withId(R.id.header)).check(matches(allOf(isDisplayed(), withText(R.string.weather_in_unknown))));
@@ -72,8 +77,9 @@ public class TestMainActivity {
     @Test
     public void testCanRetryAfterError() throws Exception {
         doReturn(Single.error(new RuntimeException("message")))
-                .doReturn(Observable.<Location>never()
-                        .toSingle()).when(geolocationService).geolocate();
+                .doReturn(Observable.<Location>never().toSingle())
+                .when(geolocationService)
+                .geolocate();
         mActivityRule.launchActivity(null);
 
         onView(withId(R.id.progress)).check(matches(not(isDisplayed())));
@@ -86,6 +92,28 @@ public class TestMainActivity {
         onView(withId(R.id.header)).check(matches(not(isDisplayed())));
         Screengrab.screenshot("progress");
     }
+
+    @Test
+    public void testCanSwipeAwayError() throws Exception {
+        doReturn(Single.error(new RuntimeException("message")))
+                .when(geolocationService)
+                .geolocate();
+        mActivityRule.launchActivity(null);
+
+        onView(withId(R.id.progress)).check(matches(not(isDisplayed())));
+        onView(withId(R.id.header)).check(matches(isDisplayed()));
+        Screengrab.screenshot("error");
+
+        onView(withId(android.support.design.R.id.snackbar_text)).perform(swipeRight());
+
+        // TODO: Need to assert that SnackBar isn't shown anymore
+        // onView(withId(android.support.design.R.id.snackbar_text)).check(matches(not(isDisplayed())));
+
+        onView(withId(R.id.progress)).check(matches(not(isDisplayed())));
+        onView(withId(R.id.header)).check(matches(isDisplayed()));
+        Screengrab.screenshot("post_swipe");
+    }
+
 
     @Test
     public void testLocationButNoWeather() throws Exception {
