@@ -92,9 +92,10 @@ public class TestMainActivity {
         doReturn(Single.error(new RuntimeException("message")))
                 .doReturn(Observable.<LocationWeather>never()
                         .toSingle()).when(weatherService).weatherForLocation(location);
-        mActivityRule.launchActivity(null);
+        MainActivity activity = mActivityRule.launchActivity(null);
         onView(withId(R.id.progress)).check(matches(not(isDisplayed())));
-        onView(withId(R.id.header)).check(matches(allOf(isDisplayed(), withText("The weather in\nNew York"))));
+        onView(withId(R.id.header)).check(matches(allOf(isDisplayed(),
+                                                        withText(activity.getString(R.string.weather_in, "New York")))));
         Screengrab.screenshot("location");
         // TODO: test that weather isn't shown
     }

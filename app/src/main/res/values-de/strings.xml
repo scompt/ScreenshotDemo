@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ScreenshotDemo</string>
+    <string name="weather_in">Das Wetter in\n%s</string>
+    <string name="weather_in_unknown">Das Wetter in\nUnbekannt</string>
+</resources>
