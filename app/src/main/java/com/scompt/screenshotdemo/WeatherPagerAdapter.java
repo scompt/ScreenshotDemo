@@ -48,6 +48,7 @@ public class WeatherPagerAdapter extends PagerAdapter {
         viewHolder.summaryTextView.setText(weatherDatum.summary());
         viewHolder.dateTextView.setText(dateFormat.format(weatherDatum.time()));
         viewHolder.iconImageView.setImageResource(weatherDatum.icon().iconResId);
+        viewHolder.iconImageView.setContentDescription(weatherDatum.icon().name);
         container.addView(view);
         return view;
     }
