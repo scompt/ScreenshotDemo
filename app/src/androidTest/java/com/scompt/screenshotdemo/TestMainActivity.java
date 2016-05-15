@@ -28,6 +28,7 @@ import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.swipeRight;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static android.support.test.espresso.matcher.ViewMatchers.isEnabled;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.allOf;
@@ -118,16 +119,66 @@ public class TestMainActivity {
     @Test
     public void testLocationButNoWeather() throws Exception {
         Location location = Location.create("New York", 407127, -740059);
-        doReturn(Single.just(location)).when(geolocationService).geolocate();
+        doReturn(Single.just(location))
+                .when(geolocationService)
+                .geolocate();
         doReturn(Single.error(new RuntimeException("message")))
-                .doReturn(Observable.<LocationWeather>never()
-                        .toSingle()).when(weatherService).weatherForLocation(location);
+                .doReturn(Observable.<LocationWeather>never().toSingle())
+                .when(weatherService)
+                .weatherForLocation(location);
         MainActivity activity = mActivityRule.launchActivity(null);
         onView(withId(R.id.progress)).check(matches(not(isDisplayed())));
         onView(withId(R.id.header)).check(matches(allOf(isDisplayed(),
                                                         withText(activity.getString(R.string.weather_in, "New York")))));
         Screengrab.screenshot("location");
         // TODO: test that weather isn't shown
+    }
+
+    @Test
+    public void testCanRefreshAfterSuccess() throws Exception {
+        Location location = Location.create("New York", 407127, -740059);
+        doReturn(Single.just(location))
+                .doReturn(Observable.<Location>never().toSingle())
+                .when(geolocationService).geolocate();
+        doReturn(Single.error(new RuntimeException("message")))
+                .doReturn(Observable.<LocationWeather>never().toSingle())
+                .when(weatherService).weatherForLocation(location);
+        mActivityRule.launchActivity(null);
+
+        onView(withId(R.id.progress)).check(matches(not(isDisplayed())));
+        onView(withId(R.id.action_refresh)).perform(click());
+        onView(withId(R.id.progress)).check(matches(isDisplayed()));
+    }
+
+    @Test
+    public void testCanRefreshAfterError() throws Exception {
+        doReturn(Single.error(new RuntimeException("message")))
+                .doReturn(Observable.<Location>never().toSingle())
+                .when(geolocationService)
+                .geolocate();
+        mActivityRule.launchActivity(null);
+
+        onView(withId(R.id.progress)).check(matches(not(isDisplayed())));
+        onView(withId(R.id.header)).check(matches(isDisplayed()));
+
+        onView(withId(R.id.action_refresh)).perform(click());
+
+        onView(withId(R.id.progress)).check(matches(isDisplayed()));
+        onView(withId(R.id.header)).check(matches(not(isDisplayed())));
+
+        onView(withId(R.id.action_refresh)).check(matches(not(isEnabled())));
+    }
+
+    @Test
+    public void testCantRefreshWhileLoading() throws Exception {
+        doReturn(Observable.<Location>never().toSingle())
+                .when(geolocationService)
+                .geolocate();
+        mActivityRule.launchActivity(null);
+
+        onView(withId(R.id.progress)).check(matches(isDisplayed()));
+        onView(withId(R.id.header)).check(matches(not(isDisplayed())));
+        onView(withId(R.id.action_refresh)).check(matches(not(isEnabled())));
     }
 
     @Before

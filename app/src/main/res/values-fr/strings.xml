@@ -5,4 +5,5 @@
     <string name="weather_in_unknown">Le temps à\nInconnu</string>
     <string name="retry">recommencez</string>
     <string name="error">Erreur: %s</string>
+    <string name="refresh">Rafraîchir</string>
 </resources>

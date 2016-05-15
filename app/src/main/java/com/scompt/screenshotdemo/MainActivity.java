@@ -6,8 +6,9 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -17,6 +18,7 @@ import com.robinhood.spark.SparkView;
 import com.scompt.screenshotdemo.models.Location;
 import com.scompt.screenshotdemo.models.LocationWeather;
 import com.scompt.screenshotdemo.models.WeatherDatum;
+import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
 
 import java.util.Collections;
 import java.util.List;
@@ -29,9 +31,10 @@ import rx.Single;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.functions.Func1;
+import rx.subjects.BehaviorSubject;
 import timber.log.Timber;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends RxAppCompatActivity {
 
     public static final PagerAdapter EMPTY_PAGER_ADAPTER = new PagerAdapter() {
         @Override
@@ -87,6 +90,10 @@ public class MainActivity extends AppCompatActivity {
     @Inject
     GeolocationService geolocationService;
 
+    // Needed because the refresh menu item isn't created until some later time. This lets it
+    // pick up the current enabled status and track it.
+    private final BehaviorSubject<Boolean> refreshMenuItemEnabledSubject = BehaviorSubject.create(false);
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -95,14 +102,41 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
+        makeCall();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main, menu);
+        final MenuItem refreshMenuItem = menu.findItem(R.id.action_refresh);
+        refreshMenuItemEnabledSubject.compose(this.<Boolean>bindToLifecycle())
+                                     .subscribe(new Action1<Boolean>() {
+                                         @Override
+                                         public void call(Boolean enabled) {
+                                             refreshMenuItem.setEnabled(enabled);
+                                         }
+                                     });
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.action_refresh) {
+            makeCall();
+            return true;
+
+        } else {
+            return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void makeCall() {
+        refreshMenuItemEnabledSubject.onNext(false);
+
         viewPager.setAdapter(EMPTY_PAGER_ADAPTER);
         sparkView1.setAdapter(EMPTY_SPARK_ADAPTER);
         sparkView2.setAdapter(EMPTY_SPARK_ADAPTER);
 
-        makeCall();
-    }
-
-    private void makeCall() {
         progressBar.setVisibility(View.VISIBLE);
         headerTextView.setVisibility(View.INVISIBLE);
 
@@ -135,10 +169,13 @@ public class MainActivity extends AppCompatActivity {
                 sparkView2.setAdapter(new WeatherSparkAdapter(weatherDays, WeatherSparkAdapter.Mode.MAX));
                 progressBar.setVisibility(View.INVISIBLE);
                 headerTextView.setVisibility(View.VISIBLE);
+                refreshMenuItemEnabledSubject.onNext(true);
+
             }
         }, new Action1<Throwable>() {
             @Override
             public void call(Throwable t) {
+                refreshMenuItemEnabledSubject.onNext(true);
                 headerTextView.setText(R.string.weather_in_unknown);
                 viewPager.setAdapter(EMPTY_PAGER_ADAPTER);
                 sparkView1.setAdapter(EMPTY_SPARK_ADAPTER);
