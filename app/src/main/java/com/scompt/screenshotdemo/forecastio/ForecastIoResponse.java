@@ -5,7 +5,7 @@ import com.scompt.screenshotdemo.models.WeatherData;
 import com.squareup.moshi.JsonAdapter;
 
 @AutoValue
-abstract class ForecastIoResponse {
+public abstract class ForecastIoResponse {
 //    public abstract WeatherDatum currently();
 
     public abstract WeatherData daily();
