@@ -125,8 +125,12 @@ public class MainActivity extends RxAppCompatActivity {
                         } else {
                             highlightWidth = sparkView1.getWidth() / dayCount;
                         }
-                        sparkHighlight.getLayoutParams().width = highlightWidth;
-                        sparkHighlight.requestLayout();
+
+                        int oldWidth = sparkHighlight.getLayoutParams().width;
+                        if (oldWidth != highlightWidth) {
+                            sparkHighlight.getLayoutParams().width = highlightWidth;
+                            sparkHighlight.requestLayout();
+                        }
                     }
                 });
         makeCall();
